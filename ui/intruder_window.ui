@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>IntruderWindow</class>
+ <widget class="QWidget" name="IntruderWindow">
+  <property name="geometry">
+   <rect>
+    <x>100</x>
+    <y>100</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <widget class="QLineEdit" name="url_input">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>360</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>Enter Target URL</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="payload_input">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>60</y>
+     <width>360</width>
+     <height>100</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>Enter custom payloads (one per line)</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="start_button">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>180</y>
+     <width>100</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Start Attack</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="results_display">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>220</y>
+     <width>360</width>
+     <height>60</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+</ui>

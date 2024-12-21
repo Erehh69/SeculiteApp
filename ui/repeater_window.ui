@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RepeaterWindow</class>
+ <widget class="QWidget" name="RepeaterWindow">
+  <property name="geometry">
+   <rect>
+    <x>100</x>
+    <y>100</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <widget class="QLineEdit" name="url_input">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>360</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>Enter URL</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="method_input">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>60</y>
+     <width>100</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>GET</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>POST</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QTextEdit" name="data_input">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>100</y>
+     <width>360</width>
+     <height>60</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="repeat_button">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>180</y>
+     <width>100</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Repeat Request</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="response_display">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>220</y>
+     <width>360</width>
+     <height>60</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+</ui>

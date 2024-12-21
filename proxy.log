@@ -1,0 +1,5 @@
+INFO:root:Set proxy to 127.0.0.1:8080
+INFO:root:Testing proxy 127.0.0.1:8080
+INFO:root:Set proxy to 127.0.0.1:8080
+INFO:root:Testing proxy 127.0.0.1:8080
+INFO:root:Intercepting is now enabled
