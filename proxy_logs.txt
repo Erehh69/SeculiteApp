@@ -1,0 +1,50 @@
+Proxy server started on 127.0.0.1:8080
+Proxy running at 127.0.0.1:8080
+Proxy server stopped.
+GET Request
+Path: http://detectportal.firefox.com/canonical.html
+Headers:
+Host: detectportal.firefox.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Cache-Control: no-cache
+Pragma: no-cache
+Connection: keep-alive
+
+
+
+GET Request
+Path: http://detectportal.firefox.com/success.txt?ipv4
+Headers:
+Host: detectportal.firefox.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Priority: u=4
+Pragma: no-cache
+Cache-Control: no-cache
+
+
+
+GET Request
+Path: http://detectportal.firefox.com/success.txt?ipv6
+Headers:
+Host: detectportal.firefox.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Priority: u=4
+Pragma: no-cache
+Cache-Control: no-cache
+
+
+
+Proxy server started on 127.0.0.1:8080
+Proxy running at 127.0.0.1:8080
+Proxy server stopped.
