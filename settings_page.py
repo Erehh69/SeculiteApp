@@ -15,7 +15,7 @@ class SettingsPage(QWidget):
         layout.addWidget(self.proxy_host)
 
         layout.addWidget(QLabel("Proxy Port:"))
-        self.proxy_port = QLineEdit("8080")
+        self.proxy_port = QLineEdit("8888")
         layout.addWidget(self.proxy_port)
 
         self.save_button = QPushButton("Save Settings")

@@ -1,75 +1,65 @@
-import logging
-import urllib.parse
-import requests
-from http.server import BaseHTTPRequestHandler
+import socket
 import ssl
+import logging
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import threading
+import socketserver
 
-# Set up logging
-logging.basicConfig(level=logging.DEBUG)
+CERT_FILE = "certs/proxy.crt"
+KEY_FILE = "certs/proxy.key"
 
 class ProxyHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        logging.debug("Handling GET request")
-        self.handle_request('GET')
-
-    def do_POST(self):
-        logging.debug("Handling POST request")
-        self.handle_request('POST')
-
-    def do_PUT(self):
-        logging.debug("Handling PUT request")
-        self.handle_request('PUT')
-
-    def do_DELETE(self):
-        logging.debug("Handling DELETE request")
-        self.handle_request('DELETE')
-
-    def handle_request(self, method):
+    def do_CONNECT(self):
         try:
-            # Log the request details
-            logging.debug(f"Received request for path: {self.path} with method: {method}")
-
-            # Read the body of the request (if any)
-            content_length = int(self.headers.get('Content-Length', 0))
-            body = self.rfile.read(content_length) if content_length > 0 else b''
-
-            # Prepare headers (exclude 'Host' header as it's already part of the target URL)
-            headers = {key: value for key, value in self.headers.items() if key.lower() != 'host'}
-
-            # Log request information
-            logging.debug(f"Original path: {self.path}")
-            base_url = "http://127.0.0.1:8000"  # Target server URL
-
-            # Construct the target URL correctly
-            target_url = urllib.parse.urljoin(base_url, self.path)  # Safely join the base URL and path
-            logging.debug(f"Forwarding to target URL: {target_url}")
-
-            # Forward the request to the target server
-            response = requests.request(
-                method,
-                target_url,
-                headers=headers,
-                data=body,
-                allow_redirects=False
-            )
-
-            # Log the response status and body for debugging
-            logging.debug(f"Received response with status code: {response.status_code}")
-            logging.debug(f"Response body (first 100 chars): {response.text[:100]}")
-
-            # Send the response back to the client
-            self.send_response(response.status_code)
-            for key, value in response.headers.items():
-                # Ensure we keep the connection alive if possible
-                if key.lower() == "connection" and value.lower() == "close":
-                    self.send_header("Connection", "close")
-                else:
-                    self.send_header(key, value)
+            self.send_response(200, "Connection Established")
             self.end_headers()
-            self.wfile.write(response.content)
+            logging.debug(f"Establishing SSL tunnel for {self.path}")
+            client_socket = self.connection
 
+            # Secure connection between client and proxy
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            context.load_cert_chain(certfile=CERT_FILE, keyfile=KEY_FILE)
+            ssl_socket = context.wrap_socket(client_socket, server_side=True)
+            logging.debug("SSL connection successfully established with client.")
+
+            # Forward HTTPS data
+            self.forward_https_traffic(ssl_socket)
         except Exception as e:
-            # Log the error and send a 500 server error response
-            logging.error(f"Error handling request: {str(e)}")
-            self.send_error(500, f"Proxy error: {e}")
-            print(f"Error: {e}")  # Print the error to the terminal for debugging
+            logging.error(f"Error in CONNECT: {e}")
+            self.send_error(500, str(e))
+
+    def forward_https_traffic(self, ssl_socket):
+        """Forward HTTPS traffic correctly"""
+        try:
+            remote_host, remote_port = self.path.split(':')
+            remote_port = int(remote_port) if remote_port.isdigit() else 443
+
+            remote_socket = ssl.create_default_context().wrap_socket(
+                socket.socket(socket.AF_INET, socket.SOCK_STREAM),
+                server_hostname=remote_host
+            )
+            remote_socket.connect((remote_host, remote_port))
+
+            while True:
+                data = ssl_socket.recv(4096)
+                if not data:
+                    break
+                remote_socket.sendall(data)
+
+                response_data = remote_socket.recv(4096)
+                ssl_socket.sendall(response_data)
+
+            remote_socket.close()
+            ssl_socket.close()
+        except Exception as e:
+            logging.error(f"Error forwarding HTTPS traffic: {e}")
+
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"This is a proxy server.")
+
+class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
+    daemon_threads = True
+    allow_reuse_address = True
