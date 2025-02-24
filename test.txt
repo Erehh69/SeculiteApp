@@ -1,0 +1,9 @@
+Scan Date: 2025-02-17
+Scan Type: Directory Traversal
+Target URL: http://example.com/files/../admin
+Payload Used: ../../../../etc/passwd
+Vulnerability Detected: Directory traversal vulnerability allows access to sensitive files
+Severity: High
+Description: The application does not sanitize input, allowing an attacker to access restricted files.
+Remediation: Validate and sanitize user input, ensure path traversal is prevented.
+-----------------------------------

