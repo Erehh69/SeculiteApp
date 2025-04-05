@@ -3,15 +3,64 @@
 #'''
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QListWidget, QStackedWidget, QWidget
-from proxy_page import ProxyPage
+import threading
+from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QListWidget, QStackedWidget, QWidget, QTextEdit, QPushButton, QVBoxLayout
 from scanner_page import ScannerPage
 from settings_page import SettingsPage
+from proxy_page import ProxyServer  # Import the updated class
 
 # Set environment variables for scaling
 os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
 os.environ['QT_SCREEN_SCALE_FACTORS'] = '1.0'
 os.environ['QT_SCALE_FACTOR'] = '1.0'
+
+class ProxyPage(QWidget):
+    """GUI wrapper for the ProxyServer"""
+
+    def __init__(self):
+        super().__init__()
+        self.proxy_server = ProxyServer()  # Create an instance of ProxyServer
+
+        # UI Elements
+        self.log_output = QTextEdit()
+        self.log_output.setReadOnly(True)
+
+        self.start_button = QPushButton("Start Proxy")
+        self.start_button.clicked.connect(self.start_proxy)
+
+        self.stop_button = QPushButton("Stop Proxy")
+        self.stop_button.setEnabled(False)
+        self.stop_button.clicked.connect(self.stop_proxy)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.log_output)
+        layout.addWidget(self.start_button)
+        layout.addWidget(self.stop_button)
+        self.setLayout(layout)
+
+    def start_proxy(self):
+        self.log_output.append("[+] Starting Proxy Server...")
+        self.proxy_server_thread = ProxyThread(self.proxy_server)
+        self.proxy_server_thread.start()
+        self.start_button.setEnabled(False)
+        self.stop_button.setEnabled(True)
+
+    def stop_proxy(self):
+        self.log_output.append("[!] Stopping Proxy Server...")
+        self.proxy_server.stop()
+        self.start_button.setEnabled(True)
+        self.stop_button.setEnabled(False)
+
+class ProxyThread(threading.Thread):
+    """Runs the ProxyServer in a separate thread to prevent UI freezing."""
+
+    def __init__(self, proxy_server):
+        super().__init__()
+        self.proxy_server = proxy_server
+        self.daemon = True  # Ensures it stops when the main app exits
+
+    def run(self):
+        self.proxy_server.start()
 
 class SecuLiteApp(QMainWindow):
     def __init__(self):
@@ -50,6 +99,7 @@ if __name__ == "__main__":
     window = SecuLiteApp()
     window.show()
     sys.exit(app.exec_())
+
 #'''
 
 #prototype

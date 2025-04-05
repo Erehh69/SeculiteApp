@@ -1,146 +1,66 @@
 import socket
 import threading
-from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QListWidget, QListWidgetItem, 
-    QPushButton, QSplitter
-)
-from PyQt5.QtCore import Qt
+import ssl
 
-class ProxyPage(QWidget):
-    def __init__(self):
-        super().__init__()
+LISTEN_HOST = '127.0.0.1'
+LISTEN_PORT = 8080
 
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #3B4F64;
-                color: #ECF0F1;
-            }
-            QListWidget {
-                background-color: #2C3E50;
-                color: #ECF0F1;
-                border: none;
-            }
-            QListWidget::item:selected {
-                background-color: #1ABC9C;
-            }
-            QPushButton {
-                background-color: #3498DB;
-                color: white;
-                border: none;
-                padding: 8px;
-                border-radius: 4px;
-            }
-            QPushButton:checked {
-                background-color: #E74C3C;
-            }
-        """)
+CERT_FILE = 'certs/proxy.crt'
+KEY_FILE = 'certs/proxy.key'
 
-        layout = QVBoxLayout()
+def handle_client(client_conn):
+    try:
+        request = client_conn.recv(65536).decode('utf-8', errors='ignore')
+        if not request.startswith('CONNECT'):
+            client_conn.sendall(b"HTTP/1.1 405 Method Not Allowed\r\n\r\n")
+            client_conn.close()
+            return
 
-        self.intercept_button = QPushButton("Intercept: OFF")
-        self.intercept_button.setCheckable(True)
-        self.intercept_button.clicked.connect(self.toggle_intercept)
-        layout.addWidget(self.intercept_button)
+        target_host, target_port = request.split(' ')[1].split(':')
+        target_port = int(target_port)
 
-        self.request_list = QListWidget()
-        self.request_list.itemClicked.connect(self.display_request_details)
+        # Acknowledge tunnel
+        client_conn.sendall(b"HTTP/1.1 200 Connection Established\r\n\r\n")
 
-        splitter = QSplitter(Qt.Horizontal)
-        splitter.addWidget(self.request_list)
-        layout.addWidget(splitter)
-        self.setLayout(layout)
+        # Wrap client socket with SSL using proxy cert
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(certfile=CERT_FILE, keyfile=KEY_FILE)
+        ssl_client = context.wrap_socket(client_conn, server_side=True)
 
-        # Start Proxy Server
-        self.proxy_thread = threading.Thread(target=self.start_proxy)
-        self.proxy_thread.daemon = True
-        self.proxy_thread.start()
+        # Connect to the real target site
+        server_sock = socket.create_connection((target_host, target_port))
+        ssl_server = ssl.create_default_context().wrap_socket(server_sock, server_hostname=target_host)
 
-    def toggle_intercept(self):
-        if self.intercept_button.isChecked():
-            self.intercept_button.setText("Intercept: ON")
-            self.intercept_button.setStyleSheet("background-color: #E74C3C; color: white;")
-        else:
-            self.intercept_button.setText("Intercept: OFF")
-            self.intercept_button.setStyleSheet("background-color: #3498DB; color: white;")
+        # Start forwarding between both sockets
+        threading.Thread(target=forward, args=(ssl_client, ssl_server), daemon=True).start()
+        threading.Thread(target=forward, args=(ssl_server, ssl_client), daemon=True).start()
 
-    def start_proxy(self):
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.bind(('127.0.0.1', 8080))
-        server_socket.listen(5)
+    except Exception as e:
+        print(f"[!] Connection error: {e}")
+        client_conn.close()
 
-        print("Proxy server running on port 8080...")
-
+def forward(source, destination):
+    try:
         while True:
-            client_socket, addr = server_socket.accept()
-            client_thread = threading.Thread(target=self.handle_client, args=(client_socket,))
-            client_thread.daemon = True
-            client_thread.start()
+            data = source.recv(4096)
+            if not data:
+                break
+            destination.sendall(data)
+    except Exception:
+        pass
+    finally:
+        source.close()
+        destination.close()
 
-    def handle_client(self, client_socket):
-        try:
-            request = client_socket.recv(4096)
+def start_proxy():
+    print(f"[+] SecuLite Proxy listening on https://{LISTEN_HOST}:{LISTEN_PORT}")
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server.bind((LISTEN_HOST, LISTEN_PORT))
+        server.listen(100)
+        while True:
+            client_sock, _ = server.accept()
+            threading.Thread(target=handle_client, args=(client_sock,), daemon=True).start()
 
-            # Check if it's a CONNECT request for HTTPS
-            if request.startswith(b"CONNECT"):
-                # Extract the host and port from the CONNECT request
-                target_host = request.split(b' ')[1].split(b':')[0].decode()
-                target_port = int(request.split(b' ')[1].split(b':')[1])
-
-                # Establish connection to the target server
-                target_socket = socket.create_connection((target_host, target_port))
-                client_socket.sendall(b"HTTP/1.1 200 Connection Established\r\n\r\n")
-
-                # Forward data between client and server
-                self.forward_data(client_socket, target_socket)
-            else:
-                # Display HTTP request line (first line)
-                request_line = request.split(b'\r\n')[0].decode(errors='ignore')
-                self.request_list.addItem(QListWidgetItem(request_line))
-
-                # Handle HTTP request
-                host_line = [line for line in request.split(b'\r\n') if b"Host:" in line]
-                if host_line:
-                    target_host = host_line[0].split(b" ")[1].decode()
-                    target_socket = socket.create_connection((target_host, 80))
-                    target_socket.sendall(request)
-
-                    response = target_socket.recv(4096)
-                    client_socket.sendall(response)
-
-                    target_socket.close()
-            
-            client_socket.close()
-
-        except Exception as e:
-            print("Error:", e)
-        finally:
-            client_socket.close()
-
-    def forward_data(self, client_socket, target_socket):
-        try:
-            while True:
-                client_socket.settimeout(1)
-                target_socket.settimeout(1)
-
-                try:
-                    client_data = client_socket.recv(4096)
-                    if client_data:
-                        target_socket.sendall(client_data)
-                except socket.timeout:
-                    pass
-                
-                try:
-                    target_data = target_socket.recv(4096)
-                    if target_data:
-                        client_socket.sendall(target_data)
-                except socket.timeout:
-                    pass
-
-        except Exception as e:
-            print("Forwarding Error:", e)
-        finally:
-            client_socket.close()
-            target_socket.close()
-
-    def display_request_details(self, item):
-        print(f"Selected: {item.text()}")
+if __name__ == "__main__":
+    start_proxy()
