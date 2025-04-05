@@ -1,12 +1,11 @@
 import socket
 import threading
 import ssl
+import os
+from dynamic_cert import generate_cert  # assumes your generate_cert is in dynamic_cert.py
 
 LISTEN_HOST = '127.0.0.1'
 LISTEN_PORT = 8080
-
-CERT_FILE = 'certs/proxy.crt'
-KEY_FILE = 'certs/proxy.key'
 
 def handle_client(client_conn):
     try:
@@ -16,22 +15,28 @@ def handle_client(client_conn):
             client_conn.close()
             return
 
+        # Parse the target host and port from CONNECT request
         target_host, target_port = request.split(' ')[1].split(':')
         target_port = int(target_port)
 
-        # Acknowledge tunnel
+        print(f"[+] Intercepting HTTPS for {target_host}:{target_port}")
+
+        # Acknowledge HTTPS tunnel establishment
         client_conn.sendall(b"HTTP/1.1 200 Connection Established\r\n\r\n")
 
-        # Wrap client socket with SSL using proxy cert
+        # 🧠 Generate dynamic cert and wrap client conn
+        crt_path, key_path = generate_cert(target_host)
+
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        context.load_cert_chain(certfile=CERT_FILE, keyfile=KEY_FILE)
+        context.load_cert_chain(certfile=crt_path, keyfile=key_path)
+
         ssl_client = context.wrap_socket(client_conn, server_side=True)
 
-        # Connect to the real target site
+        # 🧠 Connect to the actual remote server
         server_sock = socket.create_connection((target_host, target_port))
         ssl_server = ssl.create_default_context().wrap_socket(server_sock, server_hostname=target_host)
 
-        # Start forwarding between both sockets
+        # 🧠 Start bidirectional forwarding
         threading.Thread(target=forward, args=(ssl_client, ssl_server), daemon=True).start()
         threading.Thread(target=forward, args=(ssl_server, ssl_client), daemon=True).start()
 
