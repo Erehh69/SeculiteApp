@@ -1,71 +1,48 @@
-import socket
-import threading
-import ssl
-import os
-from dynamic_cert import generate_cert  # assumes your generate_cert is in dynamic_cert.py
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QListWidget, QTextEdit
+from PyQt5.QtCore import Qt
+from proxy_engine import ProxyEngine
 
-LISTEN_HOST = '127.0.0.1'
-LISTEN_PORT = 8080
+class ProxyServer(QWidget):
+    def __init__(self, log_callback=print):
+        super().__init__()
 
-def handle_client(client_conn):
-    try:
-        request = client_conn.recv(65536).decode('utf-8', errors='ignore')
-        if not request.startswith('CONNECT'):
-            client_conn.sendall(b"HTTP/1.1 405 Method Not Allowed\r\n\r\n")
-            client_conn.close()
-            return
+        self.proxy = ProxyEngine(log_callback=self.log_message)  # Use log_message to update the log area
 
-        # Parse the target host and port from CONNECT request
-        target_host, target_port = request.split(' ')[1].split(':')
-        target_port = int(target_port)
+        layout = QVBoxLayout()
 
-        print(f"[+] Intercepting HTTPS for {target_host}:{target_port}")
+        # UI Elements for intercept control
+        self.intercept_button = QPushButton("Intercept: OFF")
+        self.intercept_button.setCheckable(True)
+        self.intercept_button.clicked.connect(self.toggle_intercept)
+        layout.addWidget(self.intercept_button)
 
-        # Acknowledge HTTPS tunnel establishment
-        client_conn.sendall(b"HTTP/1.1 200 Connection Established\r\n\r\n")
+        # Log area for displaying proxy activities
+        self.log_area = QTextEdit()
+        self.log_area.setReadOnly(True)
+        layout.addWidget(self.log_area)
 
-        # 🧠 Generate dynamic cert and wrap client conn
-        crt_path, key_path = generate_cert(target_host)
+        # Dummy request list for demonstration
+        self.request_list = QListWidget()
+        dummy_requests = [
+            ("GET", "/home", "200 OK"),
+            ("POST", "/login", "302 Redirect")
+        ]
+        for method, path, status in dummy_requests:
+            self.request_list.addItem(f"{method} {path} - {status}")
 
-        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        context.load_cert_chain(certfile=crt_path, keyfile=key_path)
+        self.setLayout(layout)
 
-        ssl_client = context.wrap_socket(client_conn, server_side=True)
+    def toggle_intercept(self):
+        """Toggle intercept button to start or stop the proxy server."""
+        if self.intercept_button.isChecked():
+            self.intercept_button.setText("Intercept: ON")
+            self.intercept_button.setStyleSheet("background-color: #E74C3C; color: white;")  # Change color to indicate ON
+            self.proxy.start()  # Start the proxy server
+        else:
+            self.intercept_button.setText("Intercept: OFF")
+            self.intercept_button.setStyleSheet("background-color: #3498DB; color: white;")  # Change color to indicate OFF
+            self.proxy.stop()  # Stop the proxy server
 
-        # 🧠 Connect to the actual remote server
-        server_sock = socket.create_connection((target_host, target_port))
-        ssl_server = ssl.create_default_context().wrap_socket(server_sock, server_hostname=target_host)
-
-        # 🧠 Start bidirectional forwarding
-        threading.Thread(target=forward, args=(ssl_client, ssl_server), daemon=True).start()
-        threading.Thread(target=forward, args=(ssl_server, ssl_client), daemon=True).start()
-
-    except Exception as e:
-        print(f"[!] Connection error: {e}")
-        client_conn.close()
-
-def forward(source, destination):
-    try:
-        while True:
-            data = source.recv(4096)
-            if not data:
-                break
-            destination.sendall(data)
-    except Exception:
-        pass
-    finally:
-        source.close()
-        destination.close()
-
-def start_proxy():
-    print(f"[+] SecuLite Proxy listening on https://{LISTEN_HOST}:{LISTEN_PORT}")
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server.bind((LISTEN_HOST, LISTEN_PORT))
-        server.listen(100)
-        while True:
-            client_sock, _ = server.accept()
-            threading.Thread(target=handle_client, args=(client_sock,), daemon=True).start()
-
-if __name__ == "__main__":
-    start_proxy()
+    def log_message(self, message):
+        """Update the log area with incoming proxy messages."""
+        self.log_area.append(message)
