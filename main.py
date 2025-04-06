@@ -2,71 +2,10 @@
 
 #'''
 import sys
-import os
-import threading
-from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QListWidget, QStackedWidget, QWidget, QTextEdit, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QListWidget, QStackedWidget, QWidget
+from proxy_page import ProxyServer
 from scanner_page import ScannerPage
 from settings_page import SettingsPage
-from proxy_page import ProxyServer  # Import the ProxyServer class
-
-# Set environment variables for scaling
-os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
-os.environ['QT_SCREEN_SCALE_FACTORS'] = '1.0'
-os.environ['QT_SCALE_FACTOR'] = '1.0'
-
-class ProxyPage(QWidget):
-    """GUI wrapper for the ProxyServer"""
-
-    def __init__(self):
-        super().__init__()
-        self.proxy_server = ProxyServer(log_callback=self.update_log)  # Pass the log function for updates
-
-        # UI Elements
-        self.log_output = QTextEdit()
-        self.log_output.setReadOnly(True)
-
-        self.start_button = QPushButton("Start Proxy")
-        self.start_button.clicked.connect(self.start_proxy)
-
-        self.stop_button = QPushButton("Stop Proxy")
-        self.stop_button.setEnabled(False)
-        self.stop_button.clicked.connect(self.stop_proxy)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.log_output)
-        layout.addWidget(self.start_button)
-        layout.addWidget(self.stop_button)
-        self.setLayout(layout)
-
-    def update_log(self, message):
-        """Function to update the log area with new messages."""
-        self.log_output.append(message)
-
-    def start_proxy(self):
-        """Start the proxy server in a separate thread."""
-        self.log_output.append("[+] Starting Proxy Server...")
-        self.proxy_server_thread = ProxyThread(self.proxy_server)
-        self.proxy_server_thread.start()
-        self.start_button.setEnabled(False)
-        self.stop_button.setEnabled(True)
-
-    def stop_proxy(self):
-        """Stop the proxy server."""
-        self.log_output.append("[!] Stopping Proxy Server...")
-        self.proxy_server.stop()
-        self.start_button.setEnabled(True)
-        self.stop_button.setEnabled(False)
-
-class ProxyThread(threading.Thread):
-    """Runs the ProxyServer in a separate thread to prevent UI freezing."""
-
-    def __init__(self, proxy_server):
-        super().__init__()
-        self.proxy_server = proxy_server
-        self.daemon = True  # Ensures it stops when the main app exits
-
-    def run(self):
-        self.proxy_server.proxy.start()
 
 class SecuLiteApp(QMainWindow):
     def __init__(self):
@@ -76,17 +15,20 @@ class SecuLiteApp(QMainWindow):
 
         # Sidebar
         self.sidebar = QListWidget()
-        self.sidebar.addItem("Proxy")
+        self.sidebar.addItem("Proxy Server")
         self.sidebar.addItem("Scanner")
         self.sidebar.addItem("Settings")
         self.sidebar.currentRowChanged.connect(self.display_page)
 
         # Pages
         self.pages = QStackedWidget()
-        self.proxy_page = ProxyPage()
-        self.pages.addWidget(self.proxy_page)
-        self.pages.addWidget(ScannerPage())
-        self.pages.addWidget(SettingsPage())
+        self.proxy_server_page = ProxyServer(log_callback=self.log_message)  # Pass log callback here
+        self.scanner_page = ScannerPage()
+        self.settings_page = SettingsPage()
+
+        self.pages.addWidget(self.proxy_server_page)
+        self.pages.addWidget(self.scanner_page)
+        self.pages.addWidget(self.settings_page)
 
         # Layout
         layout = QHBoxLayout()
@@ -97,6 +39,10 @@ class SecuLiteApp(QMainWindow):
         container.setLayout(layout)
         self.setCentralWidget(container)
 
+    def log_message(self, message):
+        # Log the message (could be passed to a log area or console)
+        print("[Main Log]:", message)
+
     def display_page(self, index):
         self.pages.setCurrentIndex(index)
 
@@ -105,6 +51,9 @@ if __name__ == "__main__":
     window = SecuLiteApp()
     window.show()
     sys.exit(app.exec_())
+
+
+
 
 
 #'''

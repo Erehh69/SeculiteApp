@@ -59,7 +59,8 @@ class ProxyEngine:
             ssl_client = context.wrap_socket(client_conn, server_side=True)
 
             server_sock = socket.create_connection((target_host, target_port))
-            ssl_server = ssl.create_default_context().wrap_socket(server_sock, server_hostname=target_host)
+            context = ssl._create_unverified_context()
+            ssl_server = context.wrap_socket(server_sock, server_hostname=target_host)
 
             threading.Thread(target=self.forward, args=(ssl_client, ssl_server), daemon=True).start()
             threading.Thread(target=self.forward, args=(ssl_server, ssl_client), daemon=True).start()
