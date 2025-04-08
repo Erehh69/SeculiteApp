@@ -54,10 +54,19 @@ class ProxyServer(QWidget):
         self.setLayout(layout)
 
         # Initialize ProxyEngine with internal logging
-        self.proxy = ProxyEngine(log_callback=self.log_message)
+        self.proxy = ProxyEngine(
+            log_callback=self.log_message,
+            intercept_enabled=lambda: self.intercept_button.isChecked(),
+            intercept_handler=self.capture_intercepted_request
+        )
 
         # Auto start the proxy server
         self.proxy.start()
+
+    def capture_intercepted_request(self, request_line, full_request):
+        item = QListWidgetItem(request_line)
+        self.request_list.addItem(item)
+        self.log_message(f"[Intercepted] {request_line}")
 
     def toggle_intercept(self):
         if self.intercept_button.isChecked():
