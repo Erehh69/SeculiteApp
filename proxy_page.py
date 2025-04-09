@@ -93,8 +93,10 @@ class ProxyPage(QWidget):
 
     def capture_intercepted_request(self, request_line, full_request):
         def update_ui():
+            print("Intercepted request:", request_line)  # Debug log
             self.intercepted_requests.append((request_line, full_request))
-            self.request_list.addItem(request_line)
+            item = QListWidgetItem(request_line)
+            self.request_list.addItem(item)
             self.log_message(f"[Intercepted] {request_line}")
 
         QTimer.singleShot(0, update_ui)
@@ -140,7 +142,6 @@ class ProxyPage(QWidget):
                 self.log_message(f"[!] Error forwarding: {e}")
 
             self.remove_request(current_row)
-
 
     def drop_request(self):
         current_row = self.request_list.currentRow()

@@ -1,3 +1,4 @@
+import base64
 import socket
 import threading
 import ssl
@@ -5,7 +6,6 @@ from dynamic_cert import generate_cert
 
 LISTEN_HOST = '127.0.0.1'
 LISTEN_PORT = 8080
-
 
 class ProxyEngine:
     def __init__(self, log_callback=print, intercept_enabled=lambda: False, intercept_handler=None):
@@ -38,7 +38,6 @@ class ProxyEngine:
 
     def set_intercept(self, enabled: bool):
         self.intercept_enabled = lambda: enabled
-
 
     def handle_client(self, client_conn):
         try:
@@ -108,6 +107,12 @@ class ProxyEngine:
                     headers.append(f"Host: {host}")
                 elif line.lower().startswith("connection:"):
                     headers.append("Connection: close")
+                elif line.lower().startswith("authorization:"):
+                    # Check for base64-encoded username:password
+                    auth_header = line.split(" ")[1]
+                    decoded = base64.b64decode(auth_header).decode('utf-8')
+                    self.log(f"[+] Found Basic Auth: {decoded}")
+                    # Here, you could modify or log the decoded username:password
                 else:
                     headers.append(line)
             headers.append("Connection: close")
@@ -133,8 +138,6 @@ class ProxyEngine:
 
         except Exception as e:
             self.log(f"[!] Exception in handle_http: {e}")
-
-
 
     def forward(self, source, destination):
         try:
