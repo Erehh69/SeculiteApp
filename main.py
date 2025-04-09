@@ -3,7 +3,7 @@
 #'''
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QListWidget, QStackedWidget, QWidget
-from proxy_page import ProxyServer
+from proxy_page import ProxyPage
 from scanner_page import ScannerPage
 from settings_page import SettingsPage
 
@@ -22,7 +22,7 @@ class SecuLiteApp(QMainWindow):
 
         # Pages
         self.pages = QStackedWidget()
-        self.proxy_server_page = ProxyServer(log_callback=self.log_message)  # Pass log callback here
+        self.proxy_server_page = ProxyPage()
         self.scanner_page = ScannerPage()
         self.settings_page = SettingsPage()
 
