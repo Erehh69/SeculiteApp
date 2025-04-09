@@ -7,6 +7,9 @@ from proxy_engine import ProxyEngine
 import threading
 from urllib.parse import urlparse
 import socket
+from PyQt5.QtCore import QMetaObject, Qt
+from PyQt5.QtWidgets import QListWidgetItem
+
 
 class ProxyPage(QWidget):
     def __init__(self):
@@ -92,14 +95,10 @@ class ProxyPage(QWidget):
         self.log_message("[+] Proxy started and listening...")
 
     def capture_intercepted_request(self, request_line, full_request):
-        def update_ui():
-            print("Intercepted request:", request_line)  # Debug log
-            self.intercepted_requests.append((request_line, full_request))
-            item = QListWidgetItem(request_line)
-            self.request_list.addItem(item)
-            self.log_message(f"[Intercepted] {request_line}")
-
-        QTimer.singleShot(0, update_ui)
+        print(f"[DEBUG] capture_intercepted_request() called with: {request_line}")
+        self._pending_request_line = request_line
+        self._pending_full_request = full_request
+        QTimer.singleShot(0, self.update_ui)
 
     def on_request_selected(self, item):
         index = self.request_list.row(item)
@@ -143,6 +142,17 @@ class ProxyPage(QWidget):
 
             self.remove_request(current_row)
 
+    def update_ui(self):
+        request_line = self._pending_request_line
+        full_request = self._pending_full_request
+        print(f"[DEBUG] update_ui() running. Request Line: {request_line}")
+
+        self.intercepted_requests.append((request_line, full_request))
+        item = QListWidgetItem(request_line)
+        self.request_list.addItem(item)
+        self.request_list.repaint()
+        self.log_message(f"[Intercepted] {request_line}")
+    
     def drop_request(self):
         current_row = self.request_list.currentRow()
         if current_row >= 0:
