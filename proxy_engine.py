@@ -84,11 +84,7 @@ class ProxyEngine:
     def handle_http(self, client_socket, data):
         try:
             request_text = data
-
-            # Log raw request for debug
             self.log(f"[RAW REQUEST]:\n{request_text[:300]}")
-
-            # Split the request into header and body
             header_part, _, body_part = request_text.partition("\r\n\r\n")
             header_lines = header_part.split("\r\n")
 
@@ -96,10 +92,7 @@ class ProxyEngine:
                 self.log("[!] Malformed HTTP request")
                 return
 
-            # Parse the request line
             method, url, version = header_lines[0].split()
-
-            # Parse URL for host/port/path
             from urllib.parse import urlparse
             parsed = urlparse(url)
             host = parsed.hostname
@@ -107,52 +100,40 @@ class ProxyEngine:
             path = parsed.path or "/"
             if parsed.query:
                 path += "?" + parsed.query
-
-            # Fix request line (replace full URL with just path)
             header_lines[0] = f"{method} {path} {version}"
 
-            # Process headers
             headers = []
-            found_host = False
-            found_connection = False
             for line in header_lines[1:]:
                 if line.lower().startswith("host:"):
-                    found_host = True
                     headers.append(f"Host: {host}")
                 elif line.lower().startswith("connection:"):
-                    found_connection = True
-                    headers.append("Connection: close")  # Force close for clean response
+                    headers.append("Connection: close")
                 else:
                     headers.append(line)
+            headers.append("Connection: close")
+            full_raw_request = "\r\n".join([header_lines[0]] + headers) + "\r\n\r\n" + body_part
+            request_line = header_lines[0]
 
-            if not found_host:
-                headers.append(f"Host: {host}")
-            if not found_connection:
-                headers.append("Connection: close")
+            if self.intercept_enabled() and self.intercept_handler:
+                self.intercept_handler(request_line, full_raw_request)
+                return  # stop here until GUI decides what to do
 
-            # Rebuild the final request
-            final_request = "\r\n".join([header_lines[0]] + headers) + "\r\n\r\n"
-            final_request = final_request.encode() + body_part.encode()
-
-            self.log(f"[+] Forwarding HTTP to {host}:{port} -> {method} {path}")
-
-            # Connect to target server
+            # If not intercepted, proceed to send immediately
+            final_request = full_raw_request.encode()
             with socket.create_connection((host, port)) as server_socket:
                 server_socket.sendall(final_request)
-
-                # Relay response
                 while True:
                     response = server_socket.recv(4096)
                     if not response:
                         break
                     client_socket.sendall(response)
-
                     if b"HTTP/" in response:
                         snippet = response[:300].decode(errors="ignore")
                         self.log(f"[<] Response:\n{snippet.strip()}")
 
         except Exception as e:
             self.log(f"[!] Exception in handle_http: {e}")
+
 
 
     def forward(self, source, destination):
