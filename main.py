@@ -7,6 +7,8 @@ from proxy_page import ProxyPage
 from scanner_page import ScannerPage
 from settings_page import SettingsPage
 from repeater_page import RepeaterPage
+from intruder_page import IntruderPage  # Add this
+
 
 class SecuLiteApp(QMainWindow):
     def __init__(self):
@@ -20,6 +22,7 @@ class SecuLiteApp(QMainWindow):
         self.sidebar.addItem("Scanner")
         self.sidebar.addItem("Settings")
         self.sidebar.addItem("Repeater")
+        self.sidebar.addItem("Intruder")
         self.sidebar.currentRowChanged.connect(self.display_page)
 
         # Pages
@@ -28,11 +31,14 @@ class SecuLiteApp(QMainWindow):
         self.repeater_page = RepeaterPage()
         self.scanner_page = ScannerPage()
         self.settings_page = SettingsPage()
+        self.intruder_page = IntruderPage()
+        self.proxy_server_page.set_intruder_page(self.intruder_page)
 
         self.pages.addWidget(self.proxy_server_page)
         self.pages.addWidget(self.scanner_page)
         self.pages.addWidget(self.settings_page)
         self.pages.addWidget(self.repeater_page)
+        self.pages.addWidget(self.intruder_page)
 
         # Layout
         layout = QHBoxLayout()

@@ -190,13 +190,20 @@ class ProxyPage(QWidget):
                 self.main_window.repeater_page.add_session(full_req)
                 self.main_window.sidebar.setCurrentRow(3)  # Switch to Repeater tab
 
+    #INTRUDER
+
+    def set_intruder_page(self, intruder_page):
+        self.intruder_page = intruder_page
 
     def send_to_intruder(self):
         current_row = self.request_list.currentRow()
         if current_row >= 0:
-            req_line = self.intercepted_requests[current_row][0]
+            req_line, full_request = self.intercepted_requests[current_row]
             self.log_message(f"[⚔] Sent to Intruder: {req_line}")
-            # TODO: Hook with intruder window
+            if hasattr(self, 'intruder_page'):
+                self.intruder_page.add_intruder_session(req_line, full_request)
+                self.main_window.sidebar.setCurrentRow(4)
+
 
     def remove_request(self, index):
         self.intercepted_requests.pop(index)

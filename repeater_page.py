@@ -1,4 +1,7 @@
-# repeater_page.py
+
+import http.client
+import ssl
+from urllib.parse import urlparse
 
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QTextEdit, QPushButton, QLabel, QListWidgetItem
@@ -78,9 +81,65 @@ class RepeaterPage(QWidget):
             return
 
         raw_request = self.request_editor.toPlainText()
-        # TODO: Implement actual HTTP sending logic here.
-        dummy_response = "[Response placeholder for now...]"
+        lines = raw_request.split("\n")
+        if not lines:
+            return
 
-        # Update session data
-        self.sessions[current_index] = (raw_request, dummy_response)
-        self.response_view.setPlainText(dummy_response)
+        # Extract method, path, and protocol
+        try:
+            method, path, protocol = lines[0].strip().split()
+        except ValueError:
+            self.response_view.setPlainText("Invalid request line.")
+            return
+
+        headers = {}
+        body = ""
+        is_body = False
+
+        for line in lines[1:]:
+            line = line.strip("\r")
+            if line == "":
+                is_body = True
+                continue
+            if is_body:
+                body += line + "\n"
+            else:
+                if ":" in line:
+                    k, v = line.split(":", 1)
+                    headers[k.strip()] = v.strip()
+
+        host = headers.get("Host", "")
+        if not host:
+            self.response_view.setPlainText("Missing Host header.")
+            return
+
+        # Determine HTTP or HTTPS
+        port = 443 if protocol.lower().startswith("https") else 80
+        connection = None
+        response_data = ""
+
+        try:
+            if port == 443:
+                context = ssl.create_default_context()
+                connection = http.client.HTTPSConnection(host, port, context=context)
+            else:
+                connection = http.client.HTTPConnection(host, port)
+
+            connection.request(method, path, body=body.encode('utf-8'), headers=headers)
+            response = connection.getresponse()
+            response_body = response.read().decode("utf-8", errors="ignore")
+
+            # Format full response
+            response_data = f"{response.status} {response.reason}\n"
+            for hdr, val in response.getheaders():
+                response_data += f"{hdr}: {val}\n"
+            response_data += "\n" + response_body
+
+        except Exception as e:
+            response_data = f"Error sending request:\n{str(e)}"
+        finally:
+            if connection:
+                connection.close()
+
+        self.sessions[current_index] = (raw_request, response_data)
+        self.response_view.setPlainText(response_data)
