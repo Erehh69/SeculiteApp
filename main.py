@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QListWidget,
 from proxy_page import ProxyPage
 from scanner_page import ScannerPage
 from settings_page import SettingsPage
+from repeater_page import RepeaterPage
 
 class SecuLiteApp(QMainWindow):
     def __init__(self):
@@ -18,17 +19,20 @@ class SecuLiteApp(QMainWindow):
         self.sidebar.addItem("Proxy Server")
         self.sidebar.addItem("Scanner")
         self.sidebar.addItem("Settings")
+        self.sidebar.addItem("Repeater")
         self.sidebar.currentRowChanged.connect(self.display_page)
 
         # Pages
         self.pages = QStackedWidget()
-        self.proxy_server_page = ProxyPage()
+        self.proxy_server_page = ProxyPage(parent=self)
+        self.repeater_page = RepeaterPage()
         self.scanner_page = ScannerPage()
         self.settings_page = SettingsPage()
 
         self.pages.addWidget(self.proxy_server_page)
         self.pages.addWidget(self.scanner_page)
         self.pages.addWidget(self.settings_page)
+        self.pages.addWidget(self.repeater_page)
 
         # Layout
         layout = QHBoxLayout()

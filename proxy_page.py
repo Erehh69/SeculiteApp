@@ -9,11 +9,13 @@ from urllib.parse import urlparse
 import socket
 from PyQt5.QtCore import QMetaObject, Qt
 from PyQt5.QtWidgets import QListWidgetItem
+from PyQt5.QtWidgets import QFileDialog
 
 
 class ProxyPage(QWidget):
-    def __init__(self):
+    def __init__(self, parent=None):
         super().__init__()
+        self.main_window = parent
         self.setWindowTitle("SecuLite Proxy")
         self.setStyleSheet("background-color: #1e1e1e; color: white;")
 
@@ -41,13 +43,28 @@ class ProxyPage(QWidget):
         # Horizontal split layout
         main_layout = QHBoxLayout()
 
-        # LEFT: List of intercepted requests
+        # LEFT: Intercept list and action buttons
+        left_layout = QVBoxLayout()
         self.request_list = QListWidget()
         self.request_list.setStyleSheet("background-color: #2d2d2d; color: white;")
         self.request_list.itemClicked.connect(self.on_request_selected)
-        main_layout.addWidget(self.request_list, 2)
+        left_layout.addWidget(self.request_list)
 
-        # RIGHT: Request editor and buttons
+        # Buttons below list
+        list_btn_layout = QHBoxLayout()
+        self.clear_btn = QPushButton("Clear Intercepts")
+        self.save_btn = QPushButton("Save Intercepts")
+        for btn in [self.clear_btn, self.save_btn]:
+            btn.setStyleSheet("background-color: #333; color: white;")
+        self.clear_btn.clicked.connect(self.clear_intercepts)
+        self.save_btn.clicked.connect(self.save_intercepts)
+        list_btn_layout.addWidget(self.clear_btn)
+        list_btn_layout.addWidget(self.save_btn)
+        left_layout.addLayout(list_btn_layout)
+
+        main_layout.addLayout(left_layout, 2)
+
+        # RIGHT: Request editor and action buttons
         right_layout = QVBoxLayout()
         right_layout.addWidget(QLabel("Request Details (edit before forwarding):"))
 
@@ -55,7 +72,6 @@ class ProxyPage(QWidget):
         self.request_editor.setStyleSheet("background-color: #2d2d2d; color: white;")
         right_layout.addWidget(self.request_editor)
 
-        # Buttons: Forward / Drop / Send to Repeater / Intruder
         button_layout = QHBoxLayout()
         self.forward_btn = QPushButton("Forward")
         self.drop_btn = QPushButton("Drop")
@@ -76,7 +92,6 @@ class ProxyPage(QWidget):
 
         layout.addLayout(main_layout)
 
-        # Log output
         layout.addWidget(QLabel("Logs:"))
         self.log_output = QTextEdit()
         self.log_output.setReadOnly(True)
@@ -84,6 +99,7 @@ class ProxyPage(QWidget):
         layout.addWidget(self.log_output)
 
         self.setLayout(layout)
+
 
     def toggle_intercept(self):
         enabled = self.toggle_intercept_btn.isChecked()
@@ -94,11 +110,13 @@ class ProxyPage(QWidget):
         threading.Thread(target=self.proxy_server.start, daemon=True).start()
         self.log_message("[+] Proxy started and listening...")
 
-    def capture_intercepted_request(self, request_line, full_request):
+    def capture_intercepted_request(self, request_line, full_request, continue_callback):
         print(f"[DEBUG] capture_intercepted_request() called with: {request_line}")
         self._pending_request_line = request_line
         self._pending_full_request = full_request
+        self._pending_continue_callback = continue_callback  # Store the callback for later use
         QTimer.singleShot(0, self.update_ui)
+
 
     def on_request_selected(self, item):
         index = self.request_list.row(item)
@@ -113,46 +131,48 @@ class ProxyPage(QWidget):
             req_line = self.intercepted_requests[current_row][0]
             self.log_message(f"[→] Forwarding:\n{req_line}")
 
-            # Parse and send manually
             try:
-                lines = edited.split("\r\n")
-                request_line = lines[0]
-                method, path, _ = request_line.split()
-                host = ""
-                for line in lines:
-                    if line.lower().startswith("host:"):
-                        host = line.split(":", 1)[1].strip()
-                        break
-
-                parsed = urlparse("http://" + host + path)
-                target_host = parsed.hostname
-                target_port = parsed.port or 80
-
-                final_request = edited.encode()
-
-                with socket.create_connection((target_host, target_port)) as sock:
-                    sock.sendall(final_request)
-                    self.log_message(f"[→] Sent to {target_host}:{target_port}")
-                    response = sock.recv(4096)
-                    snippet = response[:300].decode(errors='ignore')
-                    self.log_message(f"[<] Response snippet:\n{snippet.strip()}")
-
+                if hasattr(self, "_pending_continue_callback"):
+                    self._pending_continue_callback(edited)
+                    self.log_message("[✓] Request forwarded via proxy engine.")
+                else:
+                    self.log_message("[!] No pending request to forward.")
             except Exception as e:
                 self.log_message(f"[!] Error forwarding: {e}")
 
             self.remove_request(current_row)
+
+    def clear_intercepts(self):
+        self.intercepted_requests.clear()
+        self.request_list.clear()
+        self.request_editor.clear()
+        self.log_message("[✂] Intercept list cleared.")
+
+    def save_intercepts(self):
+        filename, _ = QFileDialog.getSaveFileName(self, "Save Intercepts", "", "Text Files (*.txt)")
+        if filename:
+            try:
+                with open(filename, "w") as f:
+                    for line, full_req in self.intercepted_requests:
+                        f.write(f"### {line}\n{full_req}\n\n")
+                self.log_message(f"[💾] Saved intercepted requests to: {filename}")
+            except Exception as e:
+                self.log_message(f"[!] Error saving intercepts: {e}")
 
     def update_ui(self):
         request_line = self._pending_request_line
         full_request = self._pending_full_request
         print(f"[DEBUG] update_ui() running. Request Line: {request_line}")
 
+        method, path, _ = request_line.split()
+        display_text = f"{method} {path}"
+
         self.intercepted_requests.append((request_line, full_request))
-        item = QListWidgetItem(request_line)
+        item = QListWidgetItem(display_text)
         self.request_list.addItem(item)
         self.request_list.repaint()
-        self.log_message(f"[Intercepted] {request_line}")
-    
+        self.log_message(f"[Intercepted] {display_text}")
+
     def drop_request(self):
         current_row = self.request_list.currentRow()
         if current_row >= 0:
@@ -164,8 +184,12 @@ class ProxyPage(QWidget):
         current_row = self.request_list.currentRow()
         if current_row >= 0:
             req_line = self.intercepted_requests[current_row][0]
+            full_req = self.intercepted_requests[current_row][1]
             self.log_message(f"[⇄] Sent to Repeater: {req_line}")
-            # TODO: Hook with repeater window
+            if self.main_window and hasattr(self.main_window, "repeater_page"):
+                self.main_window.repeater_page.add_session(full_req)
+                self.main_window.sidebar.setCurrentRow(3)  # Switch to Repeater tab
+
 
     def send_to_intruder(self):
         current_row = self.request_list.currentRow()
