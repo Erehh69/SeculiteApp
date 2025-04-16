@@ -295,3 +295,213 @@
 2025-04-16 20:06:59,313 - Command Injection check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
 2025-04-16 20:06:59,313 - Scan finished.
 
+2025-04-16 20:41:25,134 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:41:25,532 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 20:41:25,532 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 20:41:25,533 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:41:25,942 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 20:41:25,942 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 20:41:25,948 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 20:41:25,949 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:41:26,344 - http://testphp.vulnweb.com:80 "GET /login.php?name=%3Cscript%3Ealert(1)%3C/script%3E HTTP/11" 200 None
+2025-04-16 20:41:26,345 - Testing XSS with payload: http://testphp.vulnweb.com/login.php?name=<script>alert(1)</script>
+2025-04-16 20:41:26,345 - XSS check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 20:41:26,346 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:41:26,718 - http://testphp.vulnweb.com:80 "GET /login.php?cmd=;ls HTTP/11" 200 None
+2025-04-16 20:41:26,718 - Testing Command Injection with payload: http://testphp.vulnweb.com/login.php?cmd=;ls
+2025-04-16 20:41:26,718 - Command Injection check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 20:41:26,718 - Scan finished.
+
+2025-04-16 20:46:52,311 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:46:52,688 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 20:46:52,689 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 20:46:52,690 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:46:53,068 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 20:46:53,069 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 20:46:53,074 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 20:46:53,076 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:46:53,477 - http://testphp.vulnweb.com:80 "GET /login.php?name=%3Cscript%3Ealert(1)%3C/script%3E HTTP/11" 200 None
+2025-04-16 20:46:53,478 - Testing XSS with payload: http://testphp.vulnweb.com/login.php?name=<script>alert(1)</script>
+2025-04-16 20:46:53,478 - XSS check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 20:46:53,479 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:46:53,834 - http://testphp.vulnweb.com:80 "GET /login.php?cmd=;ls HTTP/11" 200 None
+2025-04-16 20:46:53,834 - Testing Command Injection with payload: http://testphp.vulnweb.com/login.php?cmd=;ls
+2025-04-16 20:46:53,834 - Command Injection check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 20:46:53,835 - Scan finished.
+
+2025-04-16 20:48:32,625 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:48:32,988 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 20:48:32,988 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 20:48:32,989 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:48:33,379 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 20:48:33,380 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 20:48:33,386 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 20:48:33,387 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:48:33,783 - http://testphp.vulnweb.com:80 "GET /login.php?name=%3Cscript%3Ealert(1)%3C/script%3E HTTP/11" 200 None
+2025-04-16 20:48:33,783 - Testing XSS with payload: http://testphp.vulnweb.com/login.php?name=<script>alert(1)</script>
+2025-04-16 20:48:33,783 - XSS check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 20:48:33,784 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:48:34,195 - http://testphp.vulnweb.com:80 "GET /login.php?cmd=;ls HTTP/11" 200 None
+2025-04-16 20:48:34,195 - Testing Command Injection with payload: http://testphp.vulnweb.com/login.php?cmd=;ls
+2025-04-16 20:48:34,196 - Command Injection check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 20:48:34,196 - Scan finished.
+
+2025-04-16 20:50:44,990 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:50:45,361 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 20:50:45,362 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 20:50:45,363 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:50:45,783 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 20:50:45,783 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 20:50:45,790 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 20:50:45,791 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:50:46,200 - http://testphp.vulnweb.com:80 "GET /login.php?name=%3Cscript%3Ealert(1)%3C/script%3E HTTP/11" 200 None
+2025-04-16 20:50:46,200 - Testing XSS with payload: http://testphp.vulnweb.com/login.php?name=<script>alert(1)</script>
+2025-04-16 20:50:46,201 - XSS check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 20:50:46,201 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:50:46,608 - http://testphp.vulnweb.com:80 "GET /login.php?cmd=;ls HTTP/11" 200 None
+2025-04-16 20:50:46,609 - Testing Command Injection with payload: http://testphp.vulnweb.com/login.php?cmd=;ls
+2025-04-16 20:50:46,609 - Command Injection check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 20:50:46,609 - Scan finished.
+
+2025-04-16 20:54:22,963 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:54:23,338 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 20:54:23,339 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 20:54:23,340 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:54:23,708 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 20:54:23,708 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 20:54:23,714 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 20:54:43,041 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:54:43,431 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 20:54:43,432 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 20:54:43,433 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:54:43,823 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 20:54:43,823 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 20:54:43,830 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 20:56:45,850 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:56:46,271 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 20:56:46,272 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 20:56:46,273 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:56:46,662 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 20:56:46,662 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 20:56:46,668 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 20:59:01,846 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:59:02,242 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 20:59:02,243 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 20:59:02,244 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:59:02,651 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 20:59:02,651 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 20:59:02,651 - SQL Injection check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 20:59:02,652 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:59:03,039 - http://testphp.vulnweb.com:80 "GET /login.php?name=%3Cscript%3Ealert(1)%3C/script%3E HTTP/11" 200 None
+2025-04-16 20:59:03,039 - Testing XSS with payload: http://testphp.vulnweb.com/login.php?name=<script>alert(1)</script>
+2025-04-16 20:59:03,039 - XSS check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 20:59:03,040 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:59:03,450 - http://testphp.vulnweb.com:80 "GET /login.php?cmd=;ls HTTP/11" 200 None
+2025-04-16 20:59:03,451 - Testing Command Injection with payload: http://testphp.vulnweb.com/login.php?cmd=;ls
+2025-04-16 20:59:03,451 - Command Injection check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 20:59:03,451 - No vulnerabilities detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 20:59:03,451 - Scan finished.
+
+2025-04-16 20:59:12,403 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:59:12,801 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 20:59:12,802 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 20:59:12,803 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 20:59:13,174 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 20:59:13,175 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 20:59:13,182 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 21:01:10,524 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:01:10,921 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 21:01:10,922 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 21:01:10,923 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:01:11,347 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 21:01:11,347 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 21:01:11,353 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 21:02:37,609 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:02:38,013 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 21:02:38,013 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 21:02:38,014 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:02:38,388 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 21:02:38,389 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 21:02:38,395 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 21:04:35,162 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:04:35,519 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 21:04:35,520 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 21:04:35,521 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:04:35,932 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 21:04:35,932 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 21:04:35,939 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 21:08:17,809 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:08:18,211 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 21:08:18,212 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 21:08:18,213 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:08:18,610 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 21:08:18,610 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 21:08:18,616 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 21:10:06,336 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:10:06,714 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 21:10:06,714 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 21:10:06,715 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:10:07,086 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 21:10:07,086 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 21:10:07,093 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 21:10:07,095 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:10:07,462 - http://testphp.vulnweb.com:80 "GET /login.php?name=%3Cscript%3Ealert(1)%3C/script%3E HTTP/11" 200 None
+2025-04-16 21:10:07,463 - Testing XSS with payload: http://testphp.vulnweb.com/login.php?name=<script>alert(1)</script>
+2025-04-16 21:10:07,463 - XSS check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 21:10:07,464 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:10:07,888 - http://testphp.vulnweb.com:80 "GET /login.php?cmd=;ls HTTP/11" 200 None
+2025-04-16 21:10:07,888 - Testing Command Injection with payload: http://testphp.vulnweb.com/login.php?cmd=;ls
+2025-04-16 21:10:07,888 - Command Injection check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 21:10:07,889 - Scan finished.
+
+2025-04-16 21:13:05,347 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:13:05,756 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 21:13:05,756 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 21:13:05,757 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:13:06,154 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 21:13:06,155 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 21:13:06,161 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 21:13:06,163 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:13:06,571 - http://testphp.vulnweb.com:80 "GET /login.php?name=%3Cscript%3Ealert(1)%3C/script%3E HTTP/11" 200 None
+2025-04-16 21:13:06,571 - Testing XSS with payload: http://testphp.vulnweb.com/login.php?name=<script>alert(1)</script>
+2025-04-16 21:13:06,571 - XSS check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 21:13:06,572 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:13:06,971 - http://testphp.vulnweb.com:80 "GET /login.php?cmd=;ls HTTP/11" 200 None
+2025-04-16 21:13:06,971 - Testing Command Injection with payload: http://testphp.vulnweb.com/login.php?cmd=;ls
+2025-04-16 21:13:06,971 - Command Injection check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 21:13:06,972 - Scan finished.
+
+2025-04-16 21:18:36,972 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:18:37,395 - http://testphp.vulnweb.com:80 "GET /login.php HTTP/11" 200 None
+2025-04-16 21:18:37,396 - Initial request to http://testphp.vulnweb.com/login.php successful. Cookies retrieved.
+2025-04-16 21:18:37,397 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:18:37,784 - http://testphp.vulnweb.com:80 "GET /login.php?id=1'%20OR%201=1%20-- HTTP/11" 200 None
+2025-04-16 21:18:37,785 - Testing SQL Injection with payload: http://testphp.vulnweb.com/login.php?id=1' OR 1=1 --
+2025-04-16 21:18:37,791 - SQL Injection vulnerability detected at http://testphp.vulnweb.com/login.php.
+2025-04-16 21:18:37,793 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:18:38,202 - http://testphp.vulnweb.com:80 "GET /login.php?name=%3Cscript%3Ealert(1)%3C/script%3E HTTP/11" 200 None
+2025-04-16 21:18:38,202 - Testing XSS with payload: http://testphp.vulnweb.com/login.php?name=<script>alert(1)</script>
+2025-04-16 21:18:38,202 - XSS check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 21:18:38,203 - Starting new HTTP connection (1): testphp.vulnweb.com:80
+2025-04-16 21:18:38,624 - http://testphp.vulnweb.com:80 "GET /login.php?cmd=;ls HTTP/11" 200 None
+2025-04-16 21:18:38,624 - Testing Command Injection with payload: http://testphp.vulnweb.com/login.php?cmd=;ls
+2025-04-16 21:18:38,624 - Command Injection check for http://testphp.vulnweb.com/login.php did not find any vulnerability.
+2025-04-16 21:18:38,625 - Scan finished.
+
+2025-04-16 21:19:04,218 - Starting new HTTP connection (1): the-internet.herokuapp.com:80
+2025-04-16 21:19:04,823 - http://the-internet.herokuapp.com:80 "GET /login HTTP/11" 200 2376
+2025-04-16 21:19:04,823 - Initial request to http://the-internet.herokuapp.com/login successful. Cookies retrieved.
+2025-04-16 21:19:04,824 - Starting new HTTP connection (1): the-internet.herokuapp.com:80
+2025-04-16 21:19:06,436 - http://the-internet.herokuapp.com:80 "GET /login?id=1'%20OR%201=1%20-- HTTP/11" 200 2376
+2025-04-16 21:19:06,437 - Testing SQL Injection with payload: http://the-internet.herokuapp.com/login?id=1' OR 1=1 --
+2025-04-16 21:19:06,440 - SQL Injection vulnerability detected at http://the-internet.herokuapp.com/login.
+2025-04-16 21:19:06,441 - Starting new HTTP connection (1): the-internet.herokuapp.com:80
+2025-04-16 21:19:08,042 - http://the-internet.herokuapp.com:80 "GET /login?name=%3Cscript%3Ealert(1)%3C/script%3E HTTP/11" 200 2376
+2025-04-16 21:19:08,043 - Testing XSS with payload: http://the-internet.herokuapp.com/login?name=<script>alert(1)</script>
+2025-04-16 21:19:08,043 - XSS check for http://the-internet.herokuapp.com/login did not find any vulnerability.
+2025-04-16 21:19:08,044 - Starting new HTTP connection (1): the-internet.herokuapp.com:80
+2025-04-16 21:19:08,657 - http://the-internet.herokuapp.com:80 "GET /login?cmd=;ls HTTP/11" 200 2376
+2025-04-16 21:19:08,658 - Testing Command Injection with payload: http://the-internet.herokuapp.com/login?cmd=;ls
+2025-04-16 21:19:08,658 - Command Injection check for http://the-internet.herokuapp.com/login did not find any vulnerability.
+2025-04-16 21:19:08,658 - Scan finished.
+

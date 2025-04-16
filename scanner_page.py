@@ -4,16 +4,19 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QTextEdit, QPushButton, QCheckBox
 )
 from PyQt5.QtCore import Qt
+from reporter_page import ReporterPage
 
 # Set up logging
 logging.basicConfig(filename='scanner_log.txt', level=logging.DEBUG, format='%(asctime)s - %(message)s')
 
 class ScannerPage(QWidget):
-    def __init__(self):
+    def __init__(self, reporter_page=None):
         super().__init__()
 
+        self.reporter_page = reporter_page
+
         self.setStyleSheet("background-color: #1e1e1e; color: white;")
-        
+
         layout = QVBoxLayout()
 
         # URL input section
@@ -55,7 +58,7 @@ class ScannerPage(QWidget):
             return
 
         results = []
-        
+
         # Fetch the initial page to retrieve cookies
         try:
             response = requests.get(url, timeout=5)
@@ -79,6 +82,14 @@ class ScannerPage(QWidget):
                 self.results_output.append(f"Response Code: {sql_injection_result['status_code']}")
                 self.results_output.append(f"Response Body: {sql_injection_result['body']}")
                 logging.info(f"SQL Injection vulnerability detected at {url}.")
+                # Send to ReporterPage if found
+                if self.reporter_page:
+                    self.reporter_page.log_finding({
+                        "vulnerability": "SQL Injection",
+                        "url": sql_injection_result['payload'],
+                        "response": sql_injection_result['body'],
+                        "status": sql_injection_result['status_code']
+                    })
             else:
                 logging.info(f"SQL Injection check for {url} did not find any vulnerability.")
 
@@ -91,6 +102,14 @@ class ScannerPage(QWidget):
                 self.results_output.append(f"Response Code: {xss_result['status_code']}")
                 self.results_output.append(f"Response Body: {xss_result['body']}")
                 logging.info(f"XSS vulnerability detected at {url}.")
+                # Send to ReporterPage if found
+                if self.reporter_page:
+                    self.reporter_page.log_finding({
+                        "vulnerability": "XSS",
+                        "url": xss_result['payload'],
+                        "response": xss_result['body'],
+                        "status": xss_result['status_code']
+                    })
             else:
                 logging.info(f"XSS check for {url} did not find any vulnerability.")
 
@@ -103,6 +122,14 @@ class ScannerPage(QWidget):
                 self.results_output.append(f"Response Code: {command_injection_result['status_code']}")
                 self.results_output.append(f"Response Body: {command_injection_result['body']}")
                 logging.info(f"Command Injection vulnerability detected at {url}.")
+                # Send to ReporterPage if found
+                if self.reporter_page:
+                    self.reporter_page.log_finding({
+                        "vulnerability": "Command Injection",
+                        "url": command_injection_result['payload'],
+                        "response": command_injection_result['body'],
+                        "status": command_injection_result['status_code']
+                    })
             else:
                 logging.info(f"Command Injection check for {url} did not find any vulnerability.")
 
@@ -115,6 +142,8 @@ class ScannerPage(QWidget):
         
         # Also log results to the file
         logging.info("Scan finished.\n")
+
+
 
     def format_cookies(self, cookies):
         """
@@ -172,3 +201,12 @@ class ScannerPage(QWidget):
         except requests.RequestException as e:
             logging.error(f"Error testing Command Injection: {e}")
         return None
+
+    def log_finding(self, finding):
+        # You can customize how this data is displayed/stored in the Reporter
+        self.findings.append(finding)
+        self.update_report_view()
+
+    def update_report_view(self):
+        # Assuming you're displaying findings in a QTextEdit or similar
+        self.report_text.setText("\n".join([str(f) for f in self.findings]))

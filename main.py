@@ -2,13 +2,15 @@
 
 #'''
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QListWidget, QStackedWidget, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QListWidget, QStackedWidget, QWidget, QListWidgetItem
+from PyQt5.QtCore import Qt
 from proxy_page import ProxyPage
 from scanner_page import ScannerPage
 from settings_page import SettingsPage
 from repeater_page import RepeaterPage
-from intruder_page import IntruderPage  # Add this
-
+from intruder_page import IntruderPage
+from reporter_page import ReporterPage  # ✅ Added ReporterPage
+from scanner_page import ScannerPage
 
 class SecuLiteApp(QMainWindow):
     def __init__(self):
@@ -23,6 +25,7 @@ class SecuLiteApp(QMainWindow):
         self.sidebar.addItem("Settings")
         self.sidebar.addItem("Repeater")
         self.sidebar.addItem("Intruder")
+        self.sidebar.addItem("Reporter")  # ✅ Reporter sidebar item
         self.sidebar.currentRowChanged.connect(self.display_page)
 
         # Pages
@@ -32,6 +35,8 @@ class SecuLiteApp(QMainWindow):
         self.scanner_page = ScannerPage()
         self.settings_page = SettingsPage()
         self.intruder_page = IntruderPage()
+        self.reporter_page = ReporterPage()  # ✅ Initialize reporter
+        self.scanner_page = ScannerPage(reporter_page=self.reporter_page)
         self.proxy_server_page.set_intruder_page(self.intruder_page)
 
         self.pages.addWidget(self.proxy_server_page)
@@ -39,6 +44,7 @@ class SecuLiteApp(QMainWindow):
         self.pages.addWidget(self.settings_page)
         self.pages.addWidget(self.repeater_page)
         self.pages.addWidget(self.intruder_page)
+        self.pages.addWidget(self.reporter_page)  # ✅ Add to QStackedWidget
 
         # Layout
         layout = QHBoxLayout()
@@ -50,17 +56,25 @@ class SecuLiteApp(QMainWindow):
         self.setCentralWidget(container)
 
     def log_message(self, message):
-        # Log the message (could be passed to a log area or console)
         print("[Main Log]:", message)
 
     def display_page(self, index):
         self.pages.setCurrentIndex(index)
+
+    def log_finding(self, finding):
+        # Add the finding to the QListWidget
+        text = f"[{finding['status']}] {finding['vulnerability']} - {finding['url']}"
+        item = QListWidgetItem(text)
+        item.setData(Qt.UserRole, finding['status'])  # Store status in user data if needed for further use
+        self.vuln_list.addItem(item)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = SecuLiteApp()
     window.show()
     sys.exit(app.exec_())
+
 
 
 
